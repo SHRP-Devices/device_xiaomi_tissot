@@ -758,5 +758,6 @@
 		<string name="credits_four">and other random stuff: Flex, nicknitewold for his original twrp...</string>
 		<string name="credits_five">Special thanks to @ChonDoe, who helped me</string>
 		<string name="credits_six">in testing this recovery, and for being always present.</string>
+		<string name="same_slot_install">Install in the same slot</string>
 	</resources>
 </language>
