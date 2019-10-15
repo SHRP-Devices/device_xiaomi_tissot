@@ -137,6 +137,55 @@ if [ -f "/tmp/remtrebledata" ]; then
   ui_print "[i] You are now ready to install a non-Treble ROM or restore from a ROM backup."
 fi
 
+# Do ADBD patch
+if [ -f "/tmp/dogodmode" ]; then
+  rm /tmp/dogodmode
+  ui_print "[#] Mounting /system..."
+  targetSlot=`getCurrentSlotLetter`
+  mount "/dev/block/bootdevice/by-name/system_$targetSlot" /system > /dev/null 2>&1
+  if isTreble; then
+    ui_print "[#] Mounting /vendor..."
+    mount "/dev/block/bootdevice/by-name/vendor_$targetSlot" /vendor > /dev/null 2>&1
+  fi
+  ui_print "[#] Searching all props and adjusting for insecure ADB on boot..."
+  # loop over all prop files on /system (and /vendor since it's symlinked at /system/system/vendor) and change adb-related options
+  for f in $(find -L /system -iname \*.prop); do 
+    #sed -i 's|ro.secure=.*|ro.secure=0|' "$f"
+    sed -i 's|ro.adb.secure=.*|ro.adb.secure=0|' "$f"
+    sed -i 's|ro.debuggable=.*|ro.debuggable=1|' "$f"
+    sed -i 's|persist.sys.usb.config=.*|persist.sys.usb.config=adb|' "$f"
+    # restorecon should be enough here
+    restorecon -v "$f"
+  done
+  ui_print "[#] Adding god-mode ADBD binary to /system..."
+  # replace every occurance of adbd on /system (and /vendor since it's symlinked at /system/system/vendor) with recovery version. The path of adbd varies per ROM so this ensures it will work.
+  for f in $(find /system -iname adbd); do
+    cp -a "/tissot_manager/adbd_godmode" "$f"
+    chmod 755 "$f"
+    chown root:shell "$f"
+    # file_contexts doesn't match our path because system is mounted at /system instead of root, so get the real path, extract context from file_contexts and use chcon instead
+    # first trim the extra /system from this file path
+    contextsPath=`echo $f | sed 's|/system||'`
+    if [ -f "/file_contexts" ]; then
+      contextsEntry=`cat "/file_contexts" | grep $contextsPath`
+      fileContext=`echo $contextsEntry | awk '{ print $2 }'`
+      if [ ! "$fileContext" == "" ]; then
+        chcon -v $fileContext "$f"
+        continue
+      fi
+    fi
+    ui_print "[i] Could not find file_contexts entry for $contextsPath - if adbd is broken, then this patch is incompatible with this ROM."
+    # try restorecon anyway
+    restorecon -v "$f"
+  done
+  umount -f /system > /dev/null 2>&1
+  if isTreble; then
+    umount -f /vendor > /dev/null 2>&1
+  fi
+  ui_print "[i] Done!"
+  exit 0
+fi
+
 # Backup TWRP
 if [ -f "/tmp/backuptwrp" ]; then
   backupTwrp
