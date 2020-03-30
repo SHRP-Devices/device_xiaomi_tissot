@@ -99,3 +99,5 @@ SHRP_FONP_2 := /sys/class/leds/led:torch_1/brightness
 SHRP_FONP_3 := /sys/class/leds/led:switch/brightness
 SHRP_REC := DUMMY
 SHRP_AB := true
+SHRP_REC_TYPE := Treble
+SHRP_DEVICE_TYPE := A/B
