@@ -102,3 +102,5 @@ SHRP_AB := true
 SHRP_REC_TYPE := Treble
 SHRP_DEVICE_TYPE := A/B
 SHRP_EXPRESS := true
+SHRP_OFFICIAL := true
+SHRP_DARK := true
