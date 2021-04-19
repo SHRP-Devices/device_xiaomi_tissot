@@ -1,7 +1,7 @@
 # Mount point    FStype            Device                                   Flags
 /boot            emmc              /dev/block/bootdevice/by-name/boot       flags=slotselect
 /system          ext4              /dev/block/bootdevice/by-name/system     flags=slotselect
-/vendor          ext4              /dev/block/bootdevice/by-name/vendor     flags=slotselect;backup=1;wipeingui;display="Vendor"
+/vendor          ext4              /dev/block/bootdevice/by-name/vendor     flags=slotselect;removable;backup=1;wipeingui;display="Vendor"
 /data            ext4              /dev/block/bootdevice/by-name/userdata   flags=encryptable=footer
 /misc            emmc              /dev/block/bootdevice/by-name/misc
 /persist         ext4              /dev/block/bootdevice/by-name/persist    flags=backup=1;display="Persist"
